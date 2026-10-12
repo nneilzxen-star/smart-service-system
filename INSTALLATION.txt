@@ -1,0 +1,134 @@
+SMARTSERVICE SYSTEM - WINDOWS INSTALLATION
+==========================================
+
+FAST INSTALL
+------------
+Required: Node.js 20.19 or newer and Docker Desktop.
+
+1. Copy or clone the project source to the computer. Do not copy/share
+   backend\.env; it contains machine-specific secrets. If you copy the
+   folder manually, omit backend\.env so setup creates a fresh configuration.
+2. Install and start Docker Desktop. Wait for it to show that Docker is running.
+3. Install Node.js 20.19 or newer.
+4. Double-click setup-windows.bat and wait for setup to finish.
+
+The setup script creates backend\.env if it is missing and generates a
+private JWT secret. It then installs the backend, web, and mobile packages,
+starts MySQL and RabbitMQ containers, and launches all application processes.
+It does not replace an existing backend\.env.
+
+The first database startup automatically installs database\schema.sql and
+database\seed.sql into a persistent Docker volume. This initialization runs
+once for a new volume. Do not delete the volume if you need to keep its data.
+
+
+OPEN THE APPLICATIONS
+---------------------
+Web:             http://localhost:3000
+API health:      http://localhost:5000/api/health
+RabbitMQ UI:     http://localhost:15672
+
+The Expo terminal window displays a QR code for Expo Go. Install Expo Go on
+the Android phone or iPhone and scan the QR code. Put the phone and PC on
+the same Wi-Fi network. In the mobile app, set API server address to:
+
+  http://<PC-IPv4-address>:5000/api
+
+Run ipconfig on Windows to find the PC's IPv4 address. Allow Node.js through
+Windows Firewall on private networks. For emulators, use
+http://10.0.2.2:5000/api on Android or http://localhost:5000/api on the iOS
+simulator.
+
+
+START AFTER FIRST INSTALL
+-------------------------
+Double-click start.bat. It starts the Docker services, API, event publisher,
+event worker, web frontend, and mobile Expo server.
+
+To stop, close the application terminal windows. To stop the Docker services
+while retaining their data, run this from the project folder:
+
+  docker compose down
+
+
+MANUAL INSTALL (OPTIONAL)
+-------------------------
+Open PowerShell in the project folder. If npm.ps1 is blocked by execution
+policy, use npm.cmd as shown.
+
+  node scripts\setup-env.js
+  cd backend
+  npm.cmd install
+  cd ..\frontend
+  npm.cmd install
+  cd ..\mobile
+  npm.cmd install
+  cd ..
+  .\start.bat
+
+
+TROUBLESHOOTING
+---------------
+- Docker is missing or stopped: install/start Docker Desktop, then retry.
+- Port 3307 is in use: stop the conflicting service or change the Docker
+  database port mapping in docker-compose.yml.
+- Backend database login fails: check backend\.env. The bundled local
+  database uses DB_HOST=localhost, DB_PORT=3307, DB_USER=root, and
+  DB_PASSWORD=smartservice_local_password. Existing backend\.env settings
+  are intentionally preserved; change them only if you want to use the
+  bundled database.
+- Database connection fails on its first startup: wait for MySQL to become
+  healthy, then rerun start.bat.
+- Phone cannot reach the API: confirm both devices are on the same Wi-Fi,
+  use the PC's LAN IPv4 address (not localhost), and allow Node.js through
+  Windows Firewall on private networks.
+- Existing databases do not receive automatic schema/seed initialization.
+  Back up first; apply the needed SQL schema/migration manually.
+- To run a production mobile app build, see mobile\README.md. Expo Go is a
+  development preview, not a store-installable release.
+
+
+DEMO ACCOUNTS
+-------------
+Admin:      admin@smartservice.test
+Customer:   customer@smartservice.test
+Technician: technician@smartservice.test
+Password:   Demo@1234
+
+Change demo passwords before using a non-local deployment.
+
+
+MACOS INSTALLATION
+------------------
+Requirements: Node.js 20.19 or newer and Docker Desktop.
+
+1. Install Node.js 20.19 or newer (for example, from nodejs.org or with
+   Homebrew using brew install node). Install Docker Desktop and start it.
+2. Copy or clone the project source. Do not copy/share backend/.env because
+   it contains machine-specific secrets. Omit it when manually copying so
+   setup creates a fresh configuration.
+3. Open Terminal in the project folder and run:
+
+   bash setup-mac.sh
+
+The installer generates a private JWT secret, installs backend/web/mobile
+dependencies, starts MySQL and RabbitMQ, opens the web app, and starts the
+Expo server with its QR code in Terminal. Scan the QR with Expo Go on a
+phone on the same Wi-Fi as the Mac.
+
+In the mobile app, set the API address to:
+
+   http://<Mac-LAN-IP>:5000/api
+
+Find the Mac address in System Settings > Wi-Fi > Details. Do not use
+localhost from a physical phone. Allow incoming local network connections
+if macOS prompts for Node.js. Press Control-C in Terminal to stop the app
+processes. The database and RabbitMQ containers remain running.
+
+After first-time setup, open Terminal in the project folder and run:
+
+   bash scripts/start-mac.sh
+
+Expo Go is a development preview. For installable Android/iOS app builds,
+see mobile/README.md. iOS local native builds require macOS; EAS cloud builds
+can also be started from Windows.

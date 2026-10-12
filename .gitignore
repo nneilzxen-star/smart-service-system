@@ -1,0 +1,12 @@
+backend/.env
+backend/node_modules/
+backend/coverage/
+frontend/.env
+frontend/node_modules/
+frontend/dist/
+mobile/.env
+mobile/.env.local
+mobile/node_modules/
+mobile/.expo/
+.expo/
+.runtime/
